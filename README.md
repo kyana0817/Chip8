@@ -1,6 +1,6 @@
 # Chip-8 Emulator
 A simple Chip-8 emulator written in C++.
-This project is being implemented based on the [Arjun Nair](https://www.arjunnair.in/).
+This project is being implemented based on the [How to write an emulator (CHIP-8 interpreter)](https://multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/).
 
 ## Features
 
