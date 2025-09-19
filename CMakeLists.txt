@@ -11,13 +11,15 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # Find required packages
 find_package(OpenGL REQUIRED)
+find_package(SDL2 REQUIRED)
 
 # Include Dear ImGui
 include(AddDearImgui)
 
-add_executable(Chip8 main.cpp)
+add_executable(Chip8 main.cpp chip8.cpp)
 
-target_link_libraries(Chip8 PRIVATE 
+target_link_libraries(Chip8 PRIVATE
     dear_imgui
     OpenGL::GL
+    SDL2::SDL2
 )

@@ -1,4 +1,10 @@
 {
     "files.insertFinalNewline": true,
-    "files.trimTrailingWhitespace": true
+    "files.trimTrailingWhitespace": true,
+    "files.associations": {
+        "*.css": "css",
+        ".eslintrc.cjs": "javascript",
+        "*.svg": "xml",
+        "fstream": "cpp"
+    }
 }

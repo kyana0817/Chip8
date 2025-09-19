@@ -3,8 +3,10 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <algorithm>
+#include <cstdlib>
 
-void chip8::initialize()
+void Chip8::initialize()
 {
     pc = 0x200;
     opcode = 0;
@@ -15,7 +17,7 @@ void chip8::initialize()
         memory[i] = chip8_fontset[i];
 };
 
-void chip8::loadROM(const std::string &path)
+void Chip8::loadROM(const std::string &path)
 {
     std::ifstream file(path, std::ios::binary | std::ios::ate);
     if (!file.is_open())
@@ -38,7 +40,7 @@ void chip8::loadROM(const std::string &path)
     }
 };
 
-void chip8::emulateCycle()
+void Chip8::emulateCycle()
 {
     opcode = memory[pc] << 8 | memory[pc + 1];
     switch (opcode & 0xF000)
@@ -59,6 +61,7 @@ void chip8::emulateCycle()
             printf("Unknown opcode [0x0000]: 0x%X\n", opcode);
             break;
         }
+        break;
     case 0x1000:
         pc = opcode & 0x0FFF;
         break;
@@ -77,7 +80,7 @@ void chip8::emulateCycle()
         }
         break;
     case 0x4000:
-        if (V[opcode & 0x0F00 >> 8] != (opcode & 0x00FF))
+        if (V[(opcode & 0x0F00) >> 8] != (opcode & 0x00FF))
         {
             pc += 4;
         }
@@ -108,19 +111,19 @@ void chip8::emulateCycle()
         switch (opcode & 0x000F)
         {
         case 0x0000:
-            V[opcode & 0x0F00 >> 8] = V[opcode & 0x00F0 >> 4];
+            V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4];
             pc += 2;
             break;
         case 0x0001:
-            V[opcode & 0x0F00 >> 8] |= V[opcode & 0x00F0 >> 4];
+            V[(opcode & 0x0F00) >> 8] |= V[(opcode & 0x00F0) >> 4];
             pc += 2;
             break;
         case 0x0002:
-            V[opcode & 0x0F00 >> 8] &= V[opcode & 0x00F0 >> 4];
+            V[(opcode & 0x0F00) >> 8] &= V[(opcode & 0x00F0) >> 4];
             pc += 2;
             break;
         case 0x0003:
-            V[opcode & 0x0F00 >> 8] ^= V[opcode & 0x00F0 >> 4];
+            V[(opcode & 0x0F00) >> 8] ^= V[(opcode & 0x00F0) >> 4];
             pc += 2;
             break;
         case 0x0004:
@@ -167,6 +170,7 @@ void chip8::emulateCycle()
             printf("Unknown opcode [0x8000]: 0x%X\n", opcode);
             break;
         }
+        break;
     case 0x9000:
         if (V[(opcode & 0x0F00) >> 8] != V[(opcode & 0x00F0) >> 4])
         {
@@ -185,7 +189,7 @@ void chip8::emulateCycle()
         pc = (opcode & 0x0FFF) + V[0];
         break;
     case 0xC000:
-        V[(opcode & 0x0F00) >> 8] = (rand() % 256) & opcode & 0x00FF;
+        V[(opcode & 0x0F00) >> 8] = (rand() % 256) & (opcode & 0x00FF);
         pc += 2;
         break;
     case 0xD000:
@@ -230,7 +234,9 @@ void chip8::emulateCycle()
             break;
         default:
             printf("Unknown opcode [0xE000]: 0x%X\n", opcode);
+            break;
         }
+        break;
     case 0xF000:
         switch (opcode & 0x00FF)
         {
@@ -263,7 +269,10 @@ void chip8::emulateCycle()
             pc += 2;
             break;
         case 0x001E:
-            V[0xF] = (V[(opcode & 0x0F00) >> 8] & 0x80) >> 7;
+            if (I + V[(opcode & 0x0F00) >> 8] > 0xFFF)
+                V[0xF] = 1;
+            else
+                V[0xF] = 0;
             I += V[(opcode & 0x0F00) >> 8];
             pc += 2;
             break;
@@ -277,9 +286,23 @@ void chip8::emulateCycle()
             memory[I + 2] = (V[(opcode & 0x0F00) >> 8] % 100) % 10;
             pc += 2;
             break;
+        case 0x0055:
+            for (int i = 0; i <= ((opcode & 0x0F00) >> 8); ++i)
+                memory[I + i] = V[i];
+            I += ((opcode & 0x0F00) >> 8) + 1;
+            pc += 2;
+            break;
+        case 0x0065:
+            for (int i = 0; i <= ((opcode & 0x0F00) >> 8); ++i)
+                V[i] = memory[I + i];
+            I += ((opcode & 0x0F00) >> 8) + 1;
+            pc += 2;
+            break;
         default:
             printf("Unknown opcode [0xF000]: 0x%X\n", opcode);
+            break;
         }
+        break;
     default:
         printf("Unknown opcode: 0x%X\n", opcode);
     }

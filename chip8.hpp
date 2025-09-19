@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-class chip8
+class Chip8
 {
     int pc = 0x200;
     unsigned short opcode = 0;
@@ -13,7 +13,6 @@ class chip8
     unsigned char delay_timer;
     unsigned char sound_timer;
     unsigned short stack[16];
-    unsigned short sp;
     unsigned char key[16];
     bool drawFlag = false;
     bool keyPressFlag = false;
