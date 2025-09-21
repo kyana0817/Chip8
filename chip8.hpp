@@ -40,4 +40,6 @@ public:
     void initialize();
     void loadROM(const std::string &path);
     void emulateCycle();
+    bool getDrawFlag() const { return drawFlag; }
+    void drawConsole();
 };

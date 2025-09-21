@@ -5,6 +5,7 @@
 #include <fstream>
 #include <algorithm>
 #include <cstdlib>
+#include <iostream>
 
 void Chip8::initialize()
 {
@@ -315,3 +316,21 @@ void Chip8::emulateCycle()
         --sound_timer;
     }
 };
+
+void Chip8::drawConsole()
+{
+    std::system("clear");
+    for (int y = 0; y < 32; ++y)
+    {
+        for (int x = 0; x < 64; ++x)
+        {
+            if (gfx[x + (y * 64)] == 0)
+                std::cout << " ";
+            else
+                std::cout << "█";
+        }
+        std::cout << "\n";
+    }
+    std::cout << std::flush;
+    drawFlag = false;
+}
